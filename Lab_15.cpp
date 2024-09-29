@@ -1,8 +1,7 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <string>
-#include <iomanip>
+#include <vector>
 
 class Movie {
 private:
@@ -16,49 +15,33 @@ public:
     void setYearReleased(int year) { yearReleased = year; }
     void setScreenWriter(const std::string& writer) { screenWriter = writer; }
 
-    // Getters
-    std::string getTitle() const { return title; }
-    int getYearReleased() const { return yearReleased; }
-    std::string getScreenWriter() const { return screenWriter; }
-
     // Print method
     void print() const {
         std::cout << "Movie: " << title << "\n";
         std::cout << "    Year released: " << yearReleased << "\n";
-        std::cout << "    Screenwriter: " << screenWriter << "\n\n";
+        std::cout << "    Screenwriter: " << screenWriter << "\n";
     }
 };
 
 int main() {
-    std::vector<Movie> movies; // Container to store Movie objects
     std::ifstream inputFile("input.txt");
-
-    // Check if the file opened successfully
-    if (!inputFile) {
-        std::cerr << "Error opening file!" << std::endl;
-        return 1;
-    }
-
-    std::string title, screenWriter;
+    std::vector<Movie> movies;
+    std::string title;
     int year;
+    std::string writer;
 
-    // Read data from the input file
-    while (std::getline(inputFile, title)) {
-        inputFile >> year;
-        inputFile.ignore(); // Ignore the newline character after the year
-        std::getline(inputFile, screenWriter);
+    while (std::getline(inputFile, title) && inputFile >> year && std::getline(inputFile >> std::ws, writer)) {
+        Movie tempMovie;
+        tempMovie.setTitle(title);
+        tempMovie.setYearReleased(year);
+        tempMovie.setScreenWriter(writer);
+        movies.push_back(tempMovie);
 
-        Movie movie; // Create a temporary Movie object
-        movie.setTitle(title);
-        movie.setYearReleased(year);
-        movie.setScreenWriter(screenWriter);
-
-        movies.push_back(movie); // Append the movie object to the container
+        // To consume the newline after reading the writer
+        inputFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
-    inputFile.close(); // Close the input file
-
-    // Output the contents of the vector
+    // Output the contents
     for (const auto& movie : movies) {
         movie.print();
     }
